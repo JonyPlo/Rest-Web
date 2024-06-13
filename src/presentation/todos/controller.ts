@@ -1,9 +1,9 @@
 import { Request, Response } from 'express'
 
 const todos = [
-  { id: 1, text: 'Buy Milk', createdAt: new Date() },
-  { id: 2, text: 'Buy Eggs', createdAt: null },
-  { id: 3, text: 'Buy Bread', createdAt: new Date() },
+  { id: 1, text: 'Buy Milk', completedAt: new Date() },
+  { id: 2, text: 'Buy Eggs', completedAt: null },
+  { id: 3, text: 'Buy Bread', completedAt: new Date() },
 ]
 
 export class TodosController {
@@ -31,10 +31,43 @@ export class TodosController {
 
     if (!text) return res.status(400).json({ message: 'Text is required' })
 
-    const newTodo = { id: todos.length + 1, text, createdAt: null }
+    const newTodo = { id: todos.length + 1, text, completedAt: null }
 
     todos.push(newTodo)
 
     res.json(newTodo)
+  }
+
+  public updateTodo = (req: Request, res: Response) => {
+    const id = +req.params.id
+    if (isNaN(id))
+      return res.status(400).json({ message: 'Id argument is not a number' })
+
+    const todo = todos.find((todo) => todo.id === id)
+    if (!todo)
+      return res.status(404).json({ message: `Todo with id ${id} not found` })
+
+    const { text, completedAt } = req.body
+
+    todo.text = text || todo.text
+    completedAt === null
+      ? (todo.completedAt = null)
+      : (todo.completedAt = new Date(completedAt || todo.completedAt))
+
+    res.json(todo)
+  }
+
+  public deleteTodo = (req: Request, res: Response) => {
+    const id = +req.params.id
+    if (isNaN(id))
+      return res.status(400).json({ message: 'Id argument is not a number' })
+
+    const todoIndex = todos.findIndex((todo) => todo.id === id)
+    if (todoIndex === -1)
+      return res.status(404).json({ message: `Todo with id ${id} not found` })
+
+    todos.splice(todoIndex, 1)
+
+    res.json({ message: `Todo with id ${id} deleted` })
   }
 }

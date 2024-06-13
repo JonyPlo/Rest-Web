@@ -11,7 +11,11 @@ export class TodosRoutes {
       .get(todosController.getTodos)
       .post(todosController.createTodo)
 
-    router.route('/:id').get(todosController.getTodoById)
+    router
+      .route('/:id')
+      .get(todosController.getTodoById)
+      .put(todosController.updateTodo)
+      .delete(todosController.deleteTodo)
 
     return router
   }

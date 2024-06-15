@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { prisma } from '../../data/postgres'
+import { CreateTodoDto, UpdateTodoDto } from '../../domain/dtos'
 
 export class TodosController {
   constructor() {}
@@ -27,21 +28,24 @@ export class TodosController {
   }
 
   public createTodo = async (req: Request, res: Response) => {
-    const { text } = req.body
+    // En este caso la clase CreateTodoDto funciona como un adapter, es decir, recibe el objeto de la query, valida los datos y adapta el objeto a uno valido para poder almacenarlo en la base de datos
+    const [errorMessage, createTodoDto] = CreateTodoDto.create(req.body)
 
-    if (!text) return res.status(400).json({ message: 'Text is required' })
+    if (errorMessage) return res.status(400).json({ message: errorMessage })
 
-    const todo = await prisma.todo.create({ data: { text } })
+    const todo = await prisma.todo.create({ data: createTodoDto! })
 
     res.json(todo)
   }
 
   public updateTodo = async (req: Request, res: Response) => {
     const id = +req.params.id
-    const { text, completedAt } = req.body
+    const [errorMessage, updateTodoDto] = UpdateTodoDto.create({
+      ...req.body,
+      id,
+    })
 
-    if (isNaN(id))
-      return res.status(400).json({ message: 'Id argument is not a number' })
+    if (errorMessage) return res.status(400).json({ errorMessage })
 
     const todo = await prisma.todo.findFirst({
       where: { id },
@@ -52,7 +56,7 @@ export class TodosController {
 
     const updatedTodo = await prisma.todo.update({
       where: { id },
-      data: { text, completedAt: completedAt ? new Date(completedAt) : null },
+      data: updateTodoDto!.values,
     })
 
     res.json(updatedTodo)

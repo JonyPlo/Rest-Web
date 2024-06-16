@@ -1,10 +1,16 @@
 import { Router } from 'express'
 import { TodosController } from './controller'
+import { TodoDatasourceImpl } from '../../infrastructure/datasources/todo.datasource.impl'
+import { TodoRepositoryImpl } from '../../infrastructure/repositories/todo.repository.impl'
 
 export class TodosRoutes {
   static get routes(): Router {
     const router = Router()
-    const todosController = new TodosController()
+
+    const postgresTodoDatasource = new TodoDatasourceImpl()
+    const todoRepository = new TodoRepositoryImpl(postgresTodoDatasource)
+
+    const todosController = new TodosController(todoRepository)
 
     router
       .route('/')

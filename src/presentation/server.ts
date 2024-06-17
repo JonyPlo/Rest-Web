@@ -3,12 +3,13 @@ import path from 'path'
 
 interface Options {
   port: number
-  public_path: string
+  public_path?: string
   routes: Router
 }
 
 export class Server {
-  private app = express()
+  public readonly app = express()
+  private serverListener?: any
   private readonly port: number
   private readonly publicPath: string
   private readonly routes: Router
@@ -18,7 +19,7 @@ export class Server {
 
     this.port = port
     this.publicPath = public_path
-    this.routes = options.routes
+    this.routes = routes
   }
 
   async start() {
@@ -40,8 +41,12 @@ export class Server {
       res.sendFile(indexPath)
     })
 
-    this.app.listen(3000, () => {
+    this.serverListener = this.app.listen(3000, () => {
       console.log(`Server started on port ${this.port}`)
     })
+  }
+
+  public close() {
+    this.serverListener?.close()
   }
 }

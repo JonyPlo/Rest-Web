@@ -3,7 +3,7 @@ import { CreateTodoDto, UpdateTodoDto } from '../../domain/dtos'
 import { TodoRepository } from '../../domain'
 
 // La aplicacion de esta arquitectura se llama Domain Driven Design (DDD) y Repository Pattern (RP), quiere decir que todo esta hecho basado en repositorios, datasources, separacion de responsabilidad unica, y todo lo que esta implementado
-//* Aqui SI estamos aplicando casos de uso (use cases)
+//! Aqui no estamos aplicando casos de uso (use cases)
 
 export class TodosController {
   // Inyectamos en el constrolador de los todos, la implementacion del repositorio de los todos para poder dar de alta todos, editarlos, etc
